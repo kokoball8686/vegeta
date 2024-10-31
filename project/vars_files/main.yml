@@ -1,0 +1,12 @@
+pkgs:
+  - firewalld
+  - httpd
+  - mod_ssl
+
+svcs:
+  - firewalld
+  - httpd
+
+fw_rules:
+  - http
+  - https

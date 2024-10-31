@@ -1,0 +1,14 @@
+---
+- name: 3
+  hosts: all
+  vars:
+    kkk:
+      - /etc/yum.repos.d/MyBase.repo
+      - /etc/yum.repos.d/MyAppStream.repo
+  tasks:
+    - name: 432
+      file:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ kkk }}"
+

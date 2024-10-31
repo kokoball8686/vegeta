@@ -1,0 +1,15 @@
+- name: Manage timesync with 3 servers
+  hosts: all
+
+  tasks: 
+    - name: 2타임
+      community.general.timezone:
+        name: Asia/Seoul
+
+    - name: 3
+      ansible.builtin.import_role: 
+        name : rhel-system-roles.timesync
+      vars:
+        timesync_ntp_servers:
+          - hostname: kr.pool.ntp.org
+            iburst: true

@@ -1,0 +1,22 @@
+---
+- name: 3
+  hosts: all
+  vars:
+    kkk:
+      - n1: MyBase
+        de1: base software
+        bau: 'http://192.168.10.10/pkg/BaseOS'
+      - n1: MyAppStream
+        de1: Appstream software
+        bau: 'http://192.168.10.10/pkg/AppStream'      
+        
+  tasks:
+    - name: 432
+      ansible.builtin.yum_repository:
+        name: "{{ item.n1 }}"
+        description: "{{ item.de1 }}"
+        baseurl: "{{ item.bau }}"
+        enabled: yes
+        gpgcheck: no
+      loop: "{{ kkk }}"
+

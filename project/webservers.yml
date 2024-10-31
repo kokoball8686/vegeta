@@ -1,0 +1,44 @@
+---
+- name: 3
+  hosts: webservers
+  gather_facts: true
+  vars_files:
+    - vars_files/main.yml  
+  tasks:
+    - name: 432
+      ansible.builtin.dnf:
+        name: "{{ pkgs }}"
+        state: present
+
+    - name: 45
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+      loop: "{{ svcs }}"
+
+    - name: 45
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      loop: "{{ fw_rules }}"
+
+
+    - name: 45
+      ansible.builtin.template:
+        src: hello.html.j2
+        dest: /var/www/html/hello.html
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart_httpd
+
+  handlers:
+    - name: restart_httpd
+      ansible.builtin.systemd:
+        name: httpd
+        state: restarted
+        enabled: true
+

@@ -1,0 +1,8 @@
+---
+- name: 새로운 역할 생성
+  hosts: webservers
+  tasks:
+    - name: 아파요
+      ansible.builtin.import_role:
+        name: apache
+

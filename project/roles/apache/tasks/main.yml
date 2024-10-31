@@ -1,0 +1,39 @@
+---
+# tasks file for roles/apache
+
+
+- name: 432
+  ansible.builtin.dnf:
+    name:
+      - httpd
+      - firewalld
+      - mod_ssl
+    state: present
+
+
+- name: 45
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    mode: '0644'
+
+
+- name: 45
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - httpd
+    - firewalld
+
+- name: 45
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - http
+    - https
+  
