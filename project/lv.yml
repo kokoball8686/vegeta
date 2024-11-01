@@ -1,7 +1,7 @@
 ---
 - name: 3
   hosts: webservers
-  gather_facts: true     
+  gather_facts: true
   tasks:
   #######################################################
   # 에러메세지 점검:
@@ -15,13 +15,13 @@
   # * 파일시스템 작업
   # * 마운트 작업(/etc/fstab)
   #######################################################
-    - name: 에러메세지 출력
+    - name: 에러 메세지 출력 - sdb 디스크 유무 점검
       ansible.builtin.fail:
         msg: 'The device does not exist'
       when: ansible_devices.sdb is not defined
 
 
-    - name: 에러메세지 출력
+    - name: 파티션작업
       community.general.parted:
   # parted /dev/sdb mkpart primary 1MiB 100%
   # parted /dev/sdb set 1 lvm on
@@ -33,8 +33,49 @@
         part_start: 1MiB
         part_end: 100%
 
+    - name: 팩트 재 수집
+      ansible.builtin.setup:
+        gather_subset:
+          - facter
 
 
+
+
+    - name: 에러 메세지 출력 - 파티션 크기 점검
+      ansible.builtin.fail:
+        msg: 'Size not Enough'
+      vars:
+       sdb1size: "{{ (ansible_devices.sdb.partitions.sdb1.size | split)[0] }}"
+      when: sdb1size | float < 800
+
+    - name: LVM 작업 - research VG
+      community.general.lvg:
+        # vgcreate vg1 /dev/sdb1
+        vg: research
+        pvs: /dev/sdb1
+
+    - name: LVM 작업 - data LV
+      community.general.lvol:
+        vg: research
+        lv: data
+        size: 500m
+
+    - name: FS 작업 - ext4
+      community.general.filesystem:
+        fstype: ext4
+        dev: /dev/research/data
+        force: true
+
+    - name: Mount 작업 - /mnt/research
+      ansible.posix.mount:
+      # mount -t ext4 -o defatults /dev/research/data /mnt/research
+      # vi /etc/fstab
+      # => /dev/research/data   /mnt/research   ext4    defaults   0  2
+        path: /mnt/research
+        src: /dev/research/data
+        fstype: ext4
+        opts: defaults
+        state: mounted
 
 
 

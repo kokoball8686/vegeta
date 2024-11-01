@@ -1,0 +1,19 @@
+---
+- name: 3
+  hosts: all
+  tasks:
+    - name: 56
+      ansible.builtin.template:
+        src: hwreport.empty.j2
+        dest: /root/hwreport.txt
+        owner: root
+        group: root
+        mode: '0644'
+
+
+    - name: Specifying a destination path
+      ansible.builtin.fetch:
+        src: /root/hwreport.txt
+        dest: results/hwreport-{{ inventory_hostname_short }}.txt
+        flat: yes
+

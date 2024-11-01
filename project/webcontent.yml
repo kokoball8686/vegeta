@@ -1,0 +1,42 @@
+---
+- name: 웹 콘텐츠 제공
+  gather_facts: false
+  hosts: webservers
+  tasks:
+    ############################################
+    # 1) /webdev
+    # 2) Symbolic Link: /webdev(origin) -> /var/www/html/webdev(target)
+    # 3) /webdev/index.html
+    # 4) /webdev -> SELinux fcontext
+    #####################################
+    - name: /webdev 디렉토리 생성
+      ansible.builtin.file:
+        path: /webdev
+        state: directory
+        owner: apache
+        group: apache
+        mode: '2775'
+
+    - name: Symbolic Link 생성
+      ansible.builtin.file:
+        src: /webdev
+        dest: /var/www/html/webdev
+        state: link
+
+    - name: index.html 파일 생성
+      ansible.builtin.copy:
+        content: "WEBSERVERS\n"
+        dest: /webdev/index.html
+        mode: '0644'
+
+    - name: SELinux 설정 - /webdev
+      community.general.sefcontext:
+      # semanage fcontext -a -t httpd_sys_rw_content_t '/webdev(./*)?'
+      # restorecon -Rv /webdev
+        target: '/webdev(/.*)?'
+        setype: httpd_sys_rw_content_t
+        state: present
+
+    - name: SELinux 변경 적용
+      ansible.builtin.command: restorecon -irv /webdev
+      

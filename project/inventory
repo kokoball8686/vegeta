@@ -1,12 +1,21 @@
 [dev]
-ansible1.example.com
+ansible1.example.com ansible_ssh_host=192.168.10.11
 
 [test]
-ansible2.example.com
+ansible2.example.com ansible_ssh_host=192.168.10.12
 
 [prod]
-ansible3.example.com
-ansible4.example.com
+ansible3.example.com ansible_ssh_host=192.168.10.13
+ansible4.example.com ansible_ssh_host=192.168.10.14
 
 [webservers:children]
 prod
+
+[dev:vars]
+issue_content=Development
+
+[test:vars]
+issue_content=Test
+
+[prod:vars]
+issue_content=Production
